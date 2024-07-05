@@ -11,7 +11,7 @@ FROM maven:3.9.6-eclipse-temurin-21 AS build
 COPY . .
 
 # Ejecutar el comando Maven para limpiar y construir el proyecto, habilitando el logging detallado para depuración
-RUN mvn clean package -X
+RUN mvn clean package
 
 # Usamos una imagen de Openjdk 
 # Exponemos el puerto que nuestro componente va a usar para escuchar peticiones
