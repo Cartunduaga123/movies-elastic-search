@@ -8,7 +8,7 @@
 # Ejecutamos el comando mvn clean package (Generara un archivo JAR para el despliegue)
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 COPY . .
-RUN mvn clean package -e -X
+RUN mvn clean package
 
 # Usamos una imagen de Openjdk
 # Exponemos el puerto que nuestro componente va a usar para escuchar peticiones
