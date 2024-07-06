@@ -3,6 +3,10 @@ package com.unir.movie_app_search.service;
 import com.unir.movie_app_search.persistence.entity.MovieEntity;
 import com.unir.movie_app_search.persistence.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.elasticsearch.core.query.StringQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,6 +14,9 @@ import java.util.Optional;
 
 @Service
 public class MovieService {
+
+    @Autowired
+    private ElasticsearchRestTemplate elasticsearchRestTemplate;
 
     private final MovieRepository movieRepository;
 
@@ -39,6 +46,11 @@ public class MovieService {
 
     public boolean exists(String idMovie) {
         return this.movieRepository.existsById(idMovie);
+    }
+
+    public SearchHits<MovieEntity> searchMovies(String query) {
+        Query searchQuery = new StringQuery("{\"match\": {\"title\": {\"query\": \"" + query + "\"}}}");
+        return elasticsearchRestTemplate.search(searchQuery, MovieEntity.class);
     }
 
 }

@@ -2,6 +2,7 @@ package com.unir.movie_app_search.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.unir.movie_app_search.persistence.entity.MovieEntity;
@@ -67,6 +68,11 @@ public class MoviesController {
     @GetMapping("/peliculas/exist/{idMovie}")
     public ResponseEntity<Boolean> exist(@PathVariable String idMovie) {
         return ResponseEntity.ok(this.movieService.exists(idMovie));
+    }
+
+    @GetMapping("/search")
+    public SearchHits<MovieEntity> search(@RequestParam String query) {
+        return movieService.searchMovies(query);
     }
 
 }
