@@ -49,7 +49,12 @@ public class MovieService {
     }
 
     public SearchHits<MovieEntity> searchMovies(String query) {
-        Query searchQuery = new StringQuery("{\"match\": {\"title\": {\"query\": \"" + query + "\"}}}");
+        //Query searchQuery = new StringQuery("{\"match\": {\"nombre\": {\"query\": \"" + query + "\"}}}");
+        Query searchQuery = new StringQuery("{ \"multi_match\": { \"query\": \"" + query + "\", \"fields\": [\"nombre\", \"director\", \"sinopsis\", \"criticas\"] } }"
+
+
+
+        );
         return elasticsearchRestTemplate.search(searchQuery, MovieEntity.class);
     }
 
