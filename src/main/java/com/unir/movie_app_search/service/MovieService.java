@@ -2,9 +2,12 @@ package com.unir.movie_app_search.service;
 
 import com.unir.movie_app_search.persistence.entity.MovieEntity;
 import com.unir.movie_app_search.persistence.repository.MovieRepository;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.StringQuery;
 import org.springframework.stereotype.Service;
@@ -48,13 +51,19 @@ public class MovieService {
         return this.movieRepository.existsById(idMovie);
     }
 
-    public SearchHits<MovieEntity> searchMovies(String query) {
-        //Query searchQuery = new StringQuery("{\"match\": {\"nombre\": {\"query\": \"" + query + "\"}}}");
+    /*public SearchHits<MovieEntity> searchMovies(String query) {
         Query searchQuery = new StringQuery("{ \"multi_match\": { \"query\": \"" + query + "\", \"fields\": [\"nombre\", \"director\", \"sinopsis\", \"criticas\"] } }"
-
-
-
         );
+        return elasticsearchRestTemplate.search(searchQuery, MovieEntity.class);
+    }*/
+
+    public SearchHits<MovieEntity> searchMovies(String query) {
+        // Construir la consulta de búsqueda
+        Query searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(QueryBuilders.multiMatchQuery(query, "nombre", "director", "sinopsis", "criticas"))
+                .addAggregation(AggregationBuilders.terms("lenguaje").field("lenguaje.keyword"))
+                .build();
+
         return elasticsearchRestTemplate.search(searchQuery, MovieEntity.class);
     }
 

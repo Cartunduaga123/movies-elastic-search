@@ -2,6 +2,7 @@ package com.unir.movie_app_search.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,9 +72,23 @@ public class MoviesController {
     }
 
     @GetMapping("/search")
-    public SearchHits<MovieEntity> search(@RequestParam String query) {
-        return movieService.searchMovies(query);
-    }
+    public ResponseEntity<Map<String, Object>> search(@RequestParam String query) {
+        SearchHits<MovieEntity> searchHits = movieService.searchMovies(query);
 
+        // Procesar los resultados de las agregaciones
+        Terms lenguajeFacets = searchHits.getAggregations().get("lenguaje");
+
+        Map<String, Long> lenguajeFacetsMap = new HashMap<>();
+        for (Terms.Bucket bucket : lenguajeFacets.getBuckets()) {
+            lenguajeFacetsMap.put(bucket.getKeyAsString(), bucket.getDocCount());
+        }
+
+        // Crear la respuesta
+        Map<String, Object> response = new HashMap<>();
+        response.put("hits", searchHits);
+        response.put("lenguajeFacets", lenguajeFacetsMap);
+
+        return ResponseEntity.ok(response);
+    }
 }
 
